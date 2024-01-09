@@ -18,11 +18,23 @@
         <tr>
             <td>No</td>
             <td>Country Name</td>
+            <td>States</td>
+            <td>Edit</td>
+            <td>Delete</td>
         </tr>
             <c:forEach items="${sessionScope.countryList}" var="i" varStatus="j">
         <tr>
             <td>${j.count }</td>
             <td>${i.name }</td>
+            <c:forEach items="${i.states}" var="s">
+                <c:set var="myVar" value="${myVar}${empty myVar ? '' : ','}${s.name}" />
+            </c:forEach>
+            <td>
+                <c:out value="${myVar}"></c:out>
+            </td>
+            <c:set var="myVar" value=""/>
+            <td><a href="<%=request.getContextPath() %>/countryController?id=${i.id}&&action=edit">Edit</a></td>
+            <td><a href="<%=request.getContextPath() %>/countryController?id=${i.id}&action=delete">Delete</a></td>
         </tr>
         </c:forEach>
     </table>

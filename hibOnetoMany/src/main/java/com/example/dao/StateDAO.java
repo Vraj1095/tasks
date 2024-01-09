@@ -42,12 +42,23 @@ public class StateDAO {
         return (State) list.get(0);
     }
 
-    public List findStateByCountry(int countryId){
+    public List<Object[]> findStateByCountry(int countryId){
         SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("from State join Country where Country.id ="+countryId);
-        List list = query.list();
+        Query query = session.createNativeQuery("SELECT s.id, s.name  FROM state s INNER JOIN Country c ON s.countryId = c.id where c.id ="+countryId);
+        List list = query.getResultList();
+        transaction.commit();
+        session.close();
+        return list;
+    }
+
+    public List<Object[]> findStateOfOtherCountry(int countryId){
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createNativeQuery("SELECT s.id, s.name  FROM state s where s.countryId != "+countryId+" or s.countryId is NULL");
+        List list = query.getResultList();
         transaction.commit();
         session.close();
         return list;

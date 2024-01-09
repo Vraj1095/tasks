@@ -30,4 +30,24 @@ public class CountryDAO {
         session.close();
         return list;
     }
+
+    public List findCountryById(int id){
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Query query= session.createQuery("from Country where id="+id);
+        List list = query.list();
+        transaction.commit();
+        session.close();
+        return list;
+    }
+
+    public void deleteCountry(Country country){
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.delete(country);
+        transaction.commit();
+        session.close();
+    }
 }
