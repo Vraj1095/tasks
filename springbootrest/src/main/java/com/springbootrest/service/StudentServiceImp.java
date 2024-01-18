@@ -1,5 +1,6 @@
 package com.springbootrest.service;
 
+import com.springbootrest.Exception.StudentNotFoundException;
 import com.springbootrest.model.Student;
 import com.springbootrest.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,8 @@ public class StudentServiceImp implements  StudentService{
 
     @Override
     public Student findStudentById(int studentId) {
-        return studentRepository.findById(studentId).orElseThrow(() -> new RuntimeException("Student not found with Id"+studentId));
+        return studentRepository.findById(studentId).orElseThrow(() -> new StudentNotFoundException("Student with id="+studentId+" Not found"));
     }
-
     @Override
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
