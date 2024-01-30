@@ -1,13 +1,24 @@
 package com.springbootrest.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springbootrest.constraint.ValidFile;
+import com.springbootrest.dto.StudentRequestDTO;
+import com.springbootrest.dto.StudentResponseDTO;
 import com.springbootrest.model.Student;
 import com.springbootrest.service.StudentService;
-import com.springbootrest.service.StudentServiceImp;
 import jakarta.validation.Valid;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.AbstractFileResolvingResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.xml.XmlEventDecoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,37 +30,44 @@ public class StudentController {
     StudentService studentService;
 
     @GetMapping
-    public List<Student> getAllStudents() {
-        return  studentService.getAllStudents();
+    public ResponseEntity<StudentResponseDTO> getAllStudents() {
+        StudentResponseDTO studentResponseDTO = new StudentResponseDTO();
+        studentResponseDTO.setMessage("All Students Data");
+        studentResponseDTO.setStudent(studentService.getAllStudents());
+        return new ResponseEntity<>(studentResponseDTO,HttpStatus.OK);
     }
 
     @PostMapping
-    public Student createStudent(@Valid @RequestBody Student student){
-
-        return studentService.insertStudent(student);
+    public ResponseEntity<StudentResponseDTO> createStudent(@Valid @ModelAttribute StudentRequestDTO studentRequestDTO){
+        StudentResponseDTO studentResponseDTO = new StudentResponseDTO();
+        studentResponseDTO.setStudent(studentService.insertStudent(studentRequestDTO));
+        studentResponseDTO.setMessage("Student Inserted Successfully..!!!");
+        return new ResponseEntity<>(studentResponseDTO,HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Student> getEmployeeById(@PathVariable int id){
-        Student student = studentService.findStudentById(id);
-        return ResponseEntity.ok(student);
+    public ResponseEntity<StudentResponseDTO> getStudentById(@PathVariable int id){
+        StudentResponseDTO studentResponseDTO = new StudentResponseDTO();
+        studentResponseDTO.setMessage("Fetched Student with Id="+id);
+        studentResponseDTO.setStudent(studentService.findStudentById(id));
+        return new ResponseEntity<>(studentResponseDTO,HttpStatus.OK);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Student> updateStudent(@RequestBody Student student,@PathVariable int id){
-        Student student1  = studentService.findStudentById(id);
-        student1.setFirstname(student.getFirstname());
-        student1.setLastname(student.getLastname());
-        student1.setStandard(student.getStandard());
-        studentService.insertStudent(student1);
-
-        return ResponseEntity.ok(student1);
+    public ResponseEntity<StudentResponseDTO> updateStudent(@Valid @ModelAttribute StudentRequestDTO studentRequestDTO,@PathVariable int id){
+        Student student = this.studentService.updateStudent(studentRequestDTO, id);
+        StudentResponseDTO studentResponseDTO = new StudentResponseDTO();
+        studentResponseDTO.setMessage("Student Updated Successfully...!!!");
+        studentResponseDTO.setStudent(student);
+        return new ResponseEntity<>(studentResponseDTO,HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<HttpStatus> deleteStudent(@PathVariable int id){
-        Student student = studentService.findStudentById(id);
-        studentService.deleteStudent(student);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<StudentResponseDTO> deleteStudent(@PathVariable int id){
+        this.studentService.deleteStudent(id);
+        StudentResponseDTO studentResponseDTO = new StudentResponseDTO();
+        studentResponseDTO.setMessage("Student with id="+id+" deleted Successfully...!!");
+        studentResponseDTO.setStudent(null);
+        return new ResponseEntity<>(studentResponseDTO,HttpStatus.OK);
     }
 }

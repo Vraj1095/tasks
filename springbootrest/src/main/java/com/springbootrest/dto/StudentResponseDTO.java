@@ -1,18 +1,33 @@
 package com.springbootrest.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.springbootrest.model.Student;
+import lombok.*;
 
-@Data
+import java.util.List;
+import java.util.Objects;
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentResponseDTO {
 
-    private int id;
-    private String firstname;
-    private String lastname;
-    private int standard;
+   private String message;
+   private Object student;
 
+   @Override
+   public int hashCode() {
+      return Objects.hash(message, student);
+   }
+
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (obj == null || getClass() != obj.getClass()) return false;
+      StudentResponseDTO that = (StudentResponseDTO) obj;
+      return Objects.equals(message, that.message) &&
+              Objects.equals(student, that.student);
+   }
 }
+
+
